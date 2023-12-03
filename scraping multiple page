@@ -1,0 +1,33 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import time
+
+final = pd.DataFrame()
+
+for i in range(1, 10):
+    # URL of the website to scrape
+    url = "https://zorox.to/trending?page={}".format(i)
+
+    # Send an HTTP GET request to the website
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    Name = []
+    Episode = []
+
+    n = soup.find_all(class_='d-title')
+    for j in n:
+        Name.append(j.text)
+
+    epi = soup.find_all(class_='tick-item tick-eps')
+    for k in epi:
+        Episode.append(k.text)
+
+    Trending_series = []
+    Trending_series.append([Name, Episode])
+
+    df = pd.DataFrame(Trending_series, columns=['Name', 'Episode'])
+    time.sleep(1)
+    df.to_csv('Trending_series', index=False)
+    final = final.append(df)
